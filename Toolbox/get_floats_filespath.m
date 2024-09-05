@@ -1,4 +1,4 @@
-function [FloatsPaths] = get_floats_filespath(gdac_dir, float_ref, output_file)
+function [FloatsPaths,n_not_found] = get_floats_filespath(gdac_dir, float_ref, output_file)
 % EXEMPLE: [FloatsPaths] = get_floats_filespath(gdac_dir, float_ref, output_file)
 % get_floats_filespath gets files paths from ar_index_global_meta.txt file 
 % for given floats and optionally creates a .txt file
@@ -19,6 +19,11 @@ function [FloatsPaths] = get_floats_filespath(gdac_dir, float_ref, output_file)
 %         (andrea.garcia.juan@euro-argo.eu)
 %
 % Modified on 2020-02-25 
+
+% Modified on September, 2024, Romain Cancouët:
+% - warning messages when floats not found on the GDAC meta index file
+% - add number of not found floats on the GDAC for statistics
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % INPUT
@@ -94,8 +99,10 @@ fclose(fid);
 
 % Warning not found floats
 not_found = float_ref(~ismember(float_ref,FloatsPaths.WMO));
+n_not_found = size(not_found,1);
 if ~isempty(not_found)
-    fprintf(2,'Floats not found: %s \n',strjoin(cellstr(not_found),', '))
+    warning('*** Floats without meta files on the GDAC will be counted as DoD - check carrefully WMO list ***')
+    fprintf(2,[num2str(n_not_found) ' ' 'floats not found on the GDAC: %s \n'],strjoin(cellstr(not_found),', '))
 end
 
 
